@@ -162,26 +162,24 @@ namespace StudentInformationSystem.Controllers
         [HttpPost]
         [Route("enrollments/add")]
         public IActionResult AddEnrollment(EnrollmentViewModel model)
-        {
-            var course = _dBContext.Courses.Find(model.CourseID);
-            var student = _dBContext.Students.Find(model.StudentID);
-            var courseId = course.Id;
-            var studentId = student.Id;
+        {  
             var enrollment = new Enrollment
             {
-                StudentID = studentId,
-                CourseID = courseId
+                StudentID = model.StudentID,
+                CourseID = model.CourseID,
+                Grade = model.Grade
             };
             _dBContext.Enrollments.Add(enrollment);
             _dBContext.SaveChangesAsync();
             return Ok();
         }
-
+        
         [HttpGet]
         [Route("enrollments")]
         public IActionResult GetAllEnrollments()
         {
-            var enrollments = _dBContext.Enrollments.ToList();
+            var enrollments = _dBContext.Enrollments.Include(x => x.Student).Include(y => y.Course).ToList();
+            
             if (enrollments.Count > 0)
             {
                 return Ok(enrollments);
